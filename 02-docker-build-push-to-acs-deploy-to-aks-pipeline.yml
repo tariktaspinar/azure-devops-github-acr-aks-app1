@@ -52,7 +52,7 @@ stages:
   - deployment: Deploy
     displayName: Deploy
     pool:
-      vmImage: $(vmImageName)
+      vmImage: $(name)
     environment: 'tariktaspinarazuredevopsgithubacraksapp1.default'
     strategy:
       runOnce:
