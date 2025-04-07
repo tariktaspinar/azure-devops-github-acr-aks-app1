@@ -26,22 +26,15 @@ stages:
           Dockerfile: '**/Dockerfile'
           tags: |
             $(tag)
-            $(Build.SourceVersion)
-      - task: KubernetesManifest@0
-        displayName: Create imagePullSecret
+              $(Build.SourceVersion)
+      - task: CopyFiles@2
         inputs:
-          action: createSecret
-          secretName: $(imagePullSecret)
-          dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
-
-      - task: KubernetesManifest@0
-        displayName: Deploy to Kubernetes cluster
+          SourceFolder: '$(System.DefaultWorkingDirectory)/kube-manifests'
+          Contents: '**'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          OverWrite: true
+      - task: PublishBuildArtifacts@1
         inputs:
-          action: deploy
-          manifests: |
-            $(Pipeline.Workspace)/manifests/deployment.yml
-            $(Pipeline.Workspace)/manifests/service.yml
-          imagePullSecrets: |
-            $(imagePullSecret)
-          containers: |
-            $(containerRegistry)/$(imageRepository):$(tag)
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'kube-manifests'
+          publishLocation: 'Container'  
